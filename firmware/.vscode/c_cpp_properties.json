@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "example",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "${workspaceFolder}/xpacks/@xpack-dev-tools/arm-none-eabi-gcc/.content/bin/arm-none-eabi-g++",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm",
+            "configurationProvider": "ms-vscode.makefile-tools" 
+        }
+    ],
+    "version": 4
+}

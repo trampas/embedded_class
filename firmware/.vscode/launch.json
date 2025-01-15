@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceFolder}",
+            "executable": "./build/debug/example.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "servertype": "jlink",
+            "serverpath": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
+            "serverArgs": [],
+            "device": "ATSAMR34J18B",
+            "interface": "swd",
+            "svdFile": "${workspaceFolder}/src/CMSIS/svd/ATSAMR34J18B.svd",
+            "armToolchainPath": "${workspaceFolder}/xpacks/@xpack-dev-tools/arm-none-eabi-gcc/.content/bin",
+            "showDevDebugOutput": "raw"
+
+        }
+    ]
+}
