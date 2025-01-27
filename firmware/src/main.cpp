@@ -45,8 +45,11 @@ int main()
 
   while(1)
   {
-    LOG("Hello World %d",millis());
-    delay_ms(1000);
+    //LOG("Hello World %d",millis());
+    delay_ms(500);
+    PinHigh(PIN_RXLED);
+    delay_ms(500);
+    PinLow(PIN_RXLED);
   }
 
  return 0;

@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "",
+            "args": [
+                "${workspaceFolder}/xpacks/@xpack-dev-tools/windows-build-tools/.content/bin/make.exe",
+                "debug"
+            ],
+            "group":  {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal":"always"
+            },
+            "problemMatcher": "$gcc"
+        }
+    ]
+}

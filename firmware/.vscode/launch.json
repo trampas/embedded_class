@@ -15,12 +15,12 @@
             "servertype": "jlink",
             "serverpath": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
             "serverArgs": [],
-            "device": "ATSAMR34J18B",
+            "device": "ATSAMD51J19A",
             "interface": "swd",
-            "svdFile": "${workspaceFolder}/src/CMSIS/svd/ATSAMR34J18B.svd",
+            "svdFile": "${workspaceFolder}/src/CMSIS/svd/ATSAMD51J19A.svd",
             "armToolchainPath": "${workspaceFolder}/xpacks/@xpack-dev-tools/arm-none-eabi-gcc/.content/bin",
-            "showDevDebugOutput": "raw"
-
+            "showDevDebugOutput": "raw",
+            "preLaunchTask": "build",
         }
     ]
 }

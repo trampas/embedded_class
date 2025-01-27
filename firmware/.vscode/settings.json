@@ -1,4 +1,5 @@
 {
     "makefile.makePath": "${workspaceFolder}/xpacks/@xpack-dev-tools/windows-build-tools/.content/bin/make.exe",
     "makefile.phonyOnlyTargets": true,
+    "Debug Types": "memory-inspector.debugType",
 }

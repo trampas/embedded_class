@@ -36,7 +36,7 @@ COMMON_FLAGS += -Wextra -Wpointer-arith -Wlogical-op -Wfloat-equal -Wno-unused-p
 #COMMON_FLAGS +=-Wconversion -Wmissing-declarations -Wunused -Wuninitialized
 
 LD_FLAGS= -T$(LD_SCRIPT)  -mthumb -mcpu=cortex-m4 -fsigned-char 
-LD_FLAGS +=  --specs=nano.specs  -Wl,--cref  --specs=nosys.specs 
+LD_FLAGS +=  --specs=nano.specs  -Wl,--cref  --specs=nosys.specs
 # -static-libgcc -static-libstdc++
 C_FLAGS=$(COMMON_FLAGS) $(INC_PARAMS) $(CFLAGS)
 CXX_FLAGS=$(COMMON_FLAGS) $(INC_PARAMS) $(CXXFLAGS) -fno-rtti -fno-exceptions -Wno-register
@@ -58,6 +58,7 @@ CC = $(COMPILER_PREFIX)gcc
 CXX = $(COMPILER_PREFIX)g++
 OBJ_DUMP = $(COMPILER_PREFIX)objdump
 OBJ_COPY = $(COMPILER_PREFIX)objcopy
+SIZE = $(COMPILER_PREFIX)size
 #
 # Debug build settings
 #
@@ -79,37 +80,53 @@ RELCXX_OBJS = $(addprefix $(RELDIR)/, $(CXX_OBJS))
 RELC_FLAGS = $(C_FLAGS) $(REMOVE_UNUSED_FUNC_FLAGS) -Os -DNDEBUG
 RELCXX_FLAGS = $(CXX_FLAGS) $(REMOVE_UNUSED_FUNC_FLAGS) -Os -DNDEBUG
 
-debug: $(DBGEXE) 
+-include $(DBGC_OBJS:%.o=%.d)
+-include $(DBGCXX_OBJS:%.o=%.d)
+-include $(RELC_OBJS:%.o=%.d)
+-include $(RELCXX_OBJS:%.o=%.d)
 
-$(DBGEXE) : $(DBGC_OBJS) $(DBGCXX_OBJS)  $(LD_SCRIPT)
-	$(CC) $(LD_FLAGS) $(DBGCXX_FLAGS) -o $(DBGEXE)  $(DBGC_OBJS) $(DBGCXX_OBJS) $(LDLIBS) -Wl,-Map="$(DBGDIR)/$(OUTPUT).map"
+
+debug: $(DBGEXE)
+
+
+$(DBGEXE):$(DBGC_OBJS) $(DBGCXX_OBJS) $(LD_SCRIPT)
+	$(info    LD $(DBGEXE))
+	@$(CXX) $(LD_FLAGS) $(DBGCXX_FLAGS) -o $(DBGEXE)  $(DBGC_OBJS) $(DBGCXX_OBJS) $(LDLIBS) -Wl,-Map="$(DBGDIR)/$(OUTPUT).map"
 #	# $(OBJ_COPY) --strip-unneeded $(DBGDIR)/$(OUTPUT)_tmp.elf $(DBGEXE) 
-	$(OBJ_DUMP) -dlr $(DBGEXE) >$(DBGDIR)/$(OUTPUT).lst
-	
+	@$(OBJ_DUMP) -dlr $(DBGEXE) >$(DBGDIR)/$(OUTPUT).lst
+	@$(OBJ_COPY) -O ihex  $(DBGEXE) $(DBGDIR)/$(OUTPUT).hex
+	$(SIZE) $(DBGEXE)
+
 
 $(DBGC_OBJS):$(DBGDIR)/%.o: %.c
 	$(dir_guard)
-	$(CC) $(DBGC_FLAGS) -c $< -o $@  
+	$(info    CC $<)
+	@$(CC) -MMD -MP -MF $(@:.o=.d) $(DBGC_FLAGS) -c $< -o $@  
 
 $(DBGCXX_OBJS):$(DBGDIR)/%.o: %.cpp
 	$(dir_guard)
-	$(CXX) $(DBGCXX_FLAGS) -c $< -o $@  
+	$(info    CCX $<)
+	@$(CXX) -MMD -MP -MF $(@:.o=.d) $(DBGCXX_FLAGS) -c $< -o $@  
 
 release: $(RELEXE) 
 
 $(RELEXE) : $(RELC_OBJS) $(RELCXX_OBJS) $(LD_SCRIPT)
-	$(CC) $(LD_FLAGS) $(RELCXX_FLAGS) -o $(RELEXE) $(RELC_OBJS) $(RELCXX_OBJS) $(LDLIBS) -Wl,-Map="$(RELDIR)/$(OUTPUT).map"
+	$(dir_guard)
+	$(info    LD $(RELEXE))
+	@$(CXX) $(LD_FLAGS) $(RELCXX_FLAGS) -o $(RELEXE) $(RELC_OBJS) $(RELCXX_OBJS) $(LDLIBS) -Wl,-Map="$(RELDIR)/$(OUTPUT).map"
 
 $(RELC_OBJS):$(RELDIR)/%.o: %.c
 	$(dir_guard)
-	$(CC) $(RELC_FLAGS) -c $< -o $@  
+	$(info    CC $<)
+	@$(CC) -MMD -MP -MF $(@:.o=.d) $(RELC_FLAGS) -c $< -o $@  
 
 $(RELCXX_OBJS):$(RELDIR)/%.o: %.cpp
 	$(dir_guard)
-	$(CXX) $(RELCXX_FLAGS) -c $< -o $@  
+	$(info    CCX $<)
+	@$(CXX) -MMD -MP -MF $(@:.o=.d) $(RELCXX_FLAGS) -c $< -o $@  
 
 clean:
 	$(TOOLS_PATH)/rm -rf $(BUILD_DIR)
 
 #make sure every target is dependent on the make file and included makefiles
-.EXTRA_PREREQS+=$(foreach mk, ${MAKEFILE_LIST},$(abspath ${mk}))
+.EXTRA_PREREQS+=Makefile make_jobs.mk
